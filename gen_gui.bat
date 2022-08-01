@@ -1,0 +1,1 @@
+pyuic6 ./ui_raw/mainWindow.ui -o ./code_ui_raw/mainWindown.py
