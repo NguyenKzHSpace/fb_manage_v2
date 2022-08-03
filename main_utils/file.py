@@ -33,3 +33,10 @@ def put_data_configs(key:str,data:str):
     configs_data = read_data_configs()
     configs_data[key] = data
     save_data_configs(configs_data)
+    
+def pop_data_configs(key:str):
+    configs_data = read_data_configs()
+    if configs_data.get(key) is not None:
+        configs_data.pop(key)
+    save_data_configs(configs_data)
+    

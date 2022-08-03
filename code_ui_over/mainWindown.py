@@ -1,6 +1,8 @@
 import requests
+from code_ui_over.manage_Facebook_Account import Ui_Manage_Facebook_Account_Over
 from code_ui_raw.mainWindown import Ui_LoginWindow
-from main_utils.file import put_data_configs, read_data_configs
+from code_ui_raw.manage_Facebook_Account import Ui_Manage_Facebook_Account
+from main_utils.file import pop_data_configs, put_data_configs, read_data_configs
 import threading
 from PyQt6.QtWidgets import  QMessageBox,QWidget
 from PyQt6.QtCore import Qt
@@ -10,7 +12,7 @@ class Ui_LoginWindow_Over(Ui_LoginWindow):
     def setupUi(self, MainWindow):
         super().setupUi(MainWindow)
         self.widget = MainWindow
-        self.thread_login = None
+        self.manage_window_QWidget = None
         config_data = read_data_configs()
         if config_data.get("email") is not None:
             self.lineEdit_email.setText(config_data.get("email"))
@@ -34,25 +36,58 @@ class Ui_LoginWindow_Over(Ui_LoginWindow):
         put_data_configs(key = "server",data = server)
             
     def login(self):
+        ##
+        # 
+        # Remove old token
+        # #
+        pop_data_configs("token")
+        
+        ##
+        # 
+        # Login
+        # 
+        # #
         email = self.lineEdit_email.text()
         password = self.lineEdit_password.text()
         server = self.lineEdit_server.text()
+        ##
+        # check url of server
+        # #
         if server.startswith("http://") == False and server.startswith("http://") == False:
             return
-        
+        ##
+        # Save data login
+        # #
         put_data_configs(key = "email",data = email)
         put_data_configs(key = "password",data = password)
         put_data_configs(key = "server",data = server)
+        ##
+        # Call API login
+        # #
         url = f"{server}/login"
         data = {
             "email": email,
             "password": password
         }
         def __inner__(url:str,data:dict):
-            res = requests.post(url=url, json=data)
+            ##
+            # Call API
+            # 
+            # #
+            res = requests.post(url=url, json=data,timeout=5)
+            ##
+            # Response error
+            # #
             if res.status_code != 200:
+                dialog = QMessageBox(parent=self.widget, text=f"Login failed: {res.text}")
+                dialog.setWindowTitle("Login")
+                ret = dialog.exec()  
                 return False
             try:
+                ##
+                # Response Ok => Read data
+                # #
+                
                 res = res.json()
                 s_key = res.get("secret_key")
                 token = res.get("token").get("token_type")+" " + \
@@ -61,19 +96,25 @@ class Ui_LoginWindow_Over(Ui_LoginWindow):
                 put_data_configs(key = "s_key",data = s_key)
                 put_data_configs(key = "token",data = token)
                 put_data_configs(key = "code",data = code)
-                dialog = QMessageBox(parent=self.widget, text="Please wait!")
+                print(f"Token: {token} ")
+                dialog = QMessageBox(parent=self.widget, text=f"Login Succesfull.")
                 dialog.setWindowTitle("Login")
-                dialog.show()
+                ret = dialog.exec()  
+                self.open_manager_account_window()
             except Exception as ex:
-                print(ex)
-        
-        if self.thread_login is not None and self.thread_login.is_alive():
-            dialog = QMessageBox(parent=self.widget, text="Please wait!")
-            dialog.setWindowTitle("Login")
-            ret = dialog.exec()   
-        else:
-            self.thread_login = threading.Thread(target=__inner__, kwargs={"url":url,"data":data})
-            self.thread_login.start()
+                print(f"Error: {ex} ")
+                dialog = QMessageBox(parent=self.widget, text=f"Login Failed: {ex}.")
+                dialog.setWindowTitle("Login")
+                ret = dialog.exec()  
+                
+        __inner__(url=url,data=data)
             
-    def don(self):
-        pass
+    def open_manager_account_window(self):
+        if self.manage_window_QWidget is None:
+            self.manage_window_QWidget = QWidget()
+            manage_window = Ui_Manage_Facebook_Account_Over()
+            manage_window.set_login_window_widget(login_window=self)
+            manage_window.setupUi(qwidget = self.manage_window_QWidget)
+            self.manage_window_QWidget.show()
+            self.widget.close()
+            

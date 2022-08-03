@@ -1,3 +1,5 @@
 /.vscode
 /venv
 *.pyc
+.qt_for_python/*
+*/__pycache__/*
