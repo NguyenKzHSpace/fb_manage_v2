@@ -150,6 +150,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QLabel" name="label_status">
+         <property name="text">
+          <string>Status.</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
