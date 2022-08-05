@@ -49,6 +49,9 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         
         self.tableWidget_list_account.currentItemChanged.connect(self.load_login_button)
 
+        self.pushButton_login.clicked.connect(self.login_to_fb_account)
+        self.pushButton_OpenBrower.clicked.connect(self.open_new_brower_with_proxy)
+        
     def load_login_button(self):
         
         row = self.tableWidget_list_account.currentRow()    
@@ -66,15 +69,34 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
             return
         else:
             self.pushButton_login.setEnabled(True)
-        
+           
+            
+    def login_to_fb_account(self):
         ##
         # 
         # Open brower and put cookies, proxy to brower
         # 
         # #
+        row = self.tableWidget_list_account.currentRow()    
+        if len(self.list_account_filter)<=row:
+            self.pushButton_login.setEnabled(False)
+            return
+        
+        account = self.list_account_filter[row]
+        
+        cookies = account.get("cookies")
+        proxy = account.get("proxy")
+        
+        ##
+        # Duong code tiep cho nay
+        # 
+        # 
+        # #
+            
         
         
-        
+    def open_new_brower_with_proxy(sef):
+        pass
         
         
         
