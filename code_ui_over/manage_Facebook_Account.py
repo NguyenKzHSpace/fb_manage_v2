@@ -67,7 +67,8 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         if proxy is None:
             self.pushButton_login.setEnabled(False)
             return
-        
+        else:
+            self.pushButton_login.setEnabled(True)
         
         
     def reset_filter(self):
