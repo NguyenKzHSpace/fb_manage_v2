@@ -13,8 +13,6 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem
 class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
     
-
-
     def remove_accent(self,text,down_case:bool = True):
         result = unidecode.unidecode(text)
         if down_case:
@@ -36,7 +34,6 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         self.get_data()
         
         self.is_fillter = False
-        
         self.checkBox_filter_name.stateChanged.connect(self.filter_account)
         self.checkBox_filter_state.stateChanged.connect(self.filter_account)
         self.checkBox_filter_user_code.stateChanged.connect(self.filter_account)
@@ -70,6 +67,16 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         else:
             self.pushButton_login.setEnabled(True)
         
+        ##
+        # 
+        # Open brower and put cookies, proxy to brower
+        # 
+        # #
+        
+        
+        
+        
+        
         
     def reset_filter(self):
         self.checkBox_filter_name.setChecked(False)
@@ -81,7 +88,6 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         self.lineEdit_filter_uid.setText("")
         self.lineEdit_filter_user_code.setText("")
         self.comboBox_filter_state.setCurrentText("")
-        
         
     def filter_account(self,type_ev:str = None):
         if type_ev =="name":
@@ -102,7 +108,6 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         if self.is_fillter ==True  is not None and self.thread_update_gui is not None and self.thread_update_gui.is_alive()==False or self.thread_update_gui is None:
             self.thread_update_gui = threading.Thread(target=self.filter_data)
             self.thread_update_gui.start()
-        
   
     def filter_data(self):
         if self.is_fillter:
@@ -120,9 +125,6 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                 self.filter_user_code()
             self.insert_data(data = self.list_account_filter)
             
-            
-           
-              
     def filter_name(self):
         text = self.lineEdit_filter_name.text()
         if len(text) > 0:
