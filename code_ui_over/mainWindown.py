@@ -113,7 +113,7 @@ class Ui_LoginWindow_Over(Ui_LoginWindow):
         if self.manage_window_QWidget is None:
             self.manage_window_QWidget = QWidget()
             manage_window = Ui_Manage_Facebook_Account_Over()
-            manage_window.set_login_window_widget(login_window=self)
+            manage_window.set_login_window_widget(login_window=self.widget)
             manage_window.setupUi(qwidget = self.manage_window_QWidget)
             self.manage_window_QWidget.show()
             self.widget.close()

@@ -2,3 +2,5 @@ pyqt6
 pycryptodome
 requests
 unidecode
+webdriver-manager
+selenium

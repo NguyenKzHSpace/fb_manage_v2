@@ -39,4 +39,8 @@ def pop_data_configs(key:str):
     if configs_data.get(key) is not None:
         configs_data.pop(key)
     save_data_configs(configs_data)
+
+def get_data_configs(key:str):
+    configs_data = read_data_configs()
+    return configs_data.get(key)
     
