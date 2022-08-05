@@ -8,7 +8,7 @@ from threading import Thread
 import threading
 import time
 import unidecode
-
+from main_utils.driver import init_Chrome_Driver
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem
 class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
@@ -25,6 +25,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         self.qwidget = qwidget
         super().setupUi(qwidget)
         self.cursor = None
+        self.driver = None
         self.thread_get_data = None
         self.thread_update_gui = None
         self.list_account_from_server = []
@@ -95,8 +96,9 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
             
         
         
-    def open_new_brower_with_proxy(sef):
-        pass
+    def open_new_brower_with_proxy(self):
+        
+        self.driver = init_Chrome_Driver()
         
         
         
