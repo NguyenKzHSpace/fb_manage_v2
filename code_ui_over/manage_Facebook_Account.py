@@ -1,6 +1,7 @@
 from typing import List
 import requests
 from code_ui_raw.manage_Facebook_Account import Ui_Manage_Facebook_Account
+from main_utils.api import call_api
 from main_utils.file import get_data_configs, pop_data_configs, put_data_configs, read_data_configs
 from PyQt6.QtWidgets import  QMessageBox,QWidget
 from PyQt6.QtCore import Qt
@@ -11,6 +12,8 @@ import unidecode
 from main_utils.driver import init_Chrome_Driver
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem
+from code_ui_over.open_Brower import Ui_OpenBrower_Over
+from code_ui_over.login_Facebook import Ui_Login_Facebook_Over
 class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
     
     def remove_accent(self,text,down_case:bool = True):
@@ -82,23 +85,26 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         if len(self.list_account_filter)<=row:
             self.pushButton_login.setEnabled(False)
             return
-        
+        print(row)
         account = self.list_account_filter[row]
         
         cookies = account.get("cookies")
         proxy = account.get("proxy")
+        name = account.get("name")
+        uid = account.get("uid")
         
-        ##
-        # Duong code tiep cho nay
-        # 
-        # 
-        # #
-            
+        self.login_facebook_QWidget = QWidget()
+        login_facebook = Ui_Login_Facebook_Over()
+        login_facebook.set_info_login(proxy=proxy,cookies=cookies,name=name,uid=uid,ip=proxy.get("ip"))
+        login_facebook.setupUi(self.login_facebook_QWidget)
+        self.login_facebook_QWidget.show()
         
         
     def open_new_brower_with_proxy(self):
-        
-        self.driver = init_Chrome_Driver()
+        self.manage_window_QWidget = QWidget()
+        open_brower_fr = Ui_OpenBrower_Over()
+        open_brower_fr.setupUi(self.manage_window_QWidget)
+        self.manage_window_QWidget.show()
         
         
         
@@ -199,7 +205,6 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
             self.comboBox_filter_state.clear()
         
     def __get_data__(self):
-        data_configs = read_data_configs()
         api = "get_facebook_account"
         last_time_update_ui = time.time()
         self.label_status.setText("Loading")
@@ -211,67 +216,17 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         self.pushButton_login.setEnabled(False)
         self.pushButton_Reload.setEnabled(False)
         self.pushButton_reset.setEnabled(False)
-        self.pushButton_OpenBrower.setEnabled(False)
         self.cursor = None
         try:
-            while self.qwidget.isVisible():
+            while True:
             
                 data = {
                     "cursor": self.cursor,
                     "limit":40,
                     "is_get_page_info":False
                 }
-                url = f"{data_configs.get('server')}/{api}"
-
-                header = {
-                    "Authorization": data_configs.get('token'),
-                    "s-key": data_configs.get('s_key')
-                }
-                
-                res = requests.post(url, json=data, headers=header, timeout=5)
-                
-                if res.status_code == 401:
-                    get_data_configs(key = "email")
-                    get_data_configs(key = "password")
-                    server_url = get_data_configs(key = "server")
-                    url = f"{server_url}/login"
-                    data = {
-                        "email": get_data_configs(key = "email"),
-                        "password": get_data_configs(key = "password")
-                    }
-                    res = requests.post(url=url, json=data,timeout=5)
-                    ##
-                    # Response error
-                    # #
-                    if res.status_code != 200:
-                        dialog = QMessageBox(parent=self.qwidget, text=f"Login failed: {res.text}")
-                        dialog.setWindowTitle("Login")
-                        ret = dialog.exec()  
-                        return False
-                    try:
-                        ##
-                        # Response Ok => Read data
-                        # #
-                        
-                        res = res.json()
-                        s_key = res.get("secret_key")
-                        token = res.get("token").get("token_type")+" " + \
-                            res.get("token").get("access_token")
-                        code = res.get("code")
-                        put_data_configs(key = "s_key",data = s_key)
-                        put_data_configs(key = "token",data = token)
-                        put_data_configs(key = "code",data = code)
-                        print(f"Token: {token} ")
-                        data_configs = read_data_configs()
-                        continue
-                    
-                    except Exception as ex:
-                        print(f"Error: {ex} ")
-                        dialog = QMessageBox(parent=self.qwidget, text=f"Login Failed: {ex}.")
-                        dialog.setWindowTitle("Login")
-                        ret = dialog.exec()  
-                        return
-                                    
+                res = call_api(method="post",api=api,data=data)
+                       
                 if res.status_code != 200:
                     print(res.status_code)
                     print(res.text)
@@ -301,7 +256,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                     self.tableWidget_list_account.resizeColumnsToContents()
                     self.pushButton_Reload.setEnabled(True)
                     self.pushButton_reset.setEnabled(True)
-                    self.pushButton_OpenBrower.setEnabled(True)
+                    # self.pushButton_OpenBrower.setEnabled(True)
                     self.list_account_filter = self.list_account_from_server.copy()
                     return
                 if time.time()-last_time_update_ui>0.5:
