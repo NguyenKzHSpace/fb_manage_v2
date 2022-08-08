@@ -3,4 +3,4 @@
 *.pyc
 .qt_for_python/*
 */__pycache__/*
-code_ui_raw/__pycache__/mainWindown.cpython-310.pyc
+
