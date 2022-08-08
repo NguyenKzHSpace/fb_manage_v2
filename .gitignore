@@ -4,3 +4,8 @@
 .qt_for_python/*
 */__pycache__/*
 
+gen_exe.bat
+build/*
+.gitignore
+=
+fb_manage_v2.spec
