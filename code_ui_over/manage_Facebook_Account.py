@@ -3,7 +3,7 @@ import requests
 from code_ui_raw.manage_Facebook_Account import Ui_Manage_Facebook_Account
 from main_utils.api import call_api
 from main_utils.file import get_data_configs, pop_data_configs, put_data_configs, read_data_configs
-from PyQt6.QtWidgets import  QMessageBox,QWidget
+from PyQt6.QtWidgets import  QMessageBox,QWidget,QLabel
 from PyQt6.QtCore import Qt
 from threading import Thread
 import threading
@@ -34,6 +34,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         self.list_account_from_server = []
         self.list_account_filter = []
         self.list_state = []
+        self.statictis_state = {}
         
         self.get_data()
         
@@ -85,9 +86,9 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         if len(self.list_account_filter)<=row:
             self.pushButton_login.setEnabled(False)
             return
-        print(row)
-        account = self.list_account_filter[row]
         
+        account = self.list_account_filter[row]
+        print(f"{row}  -{len( self.list_account_filter)} - {account.get('uid')}")
         cookies = account.get("cookies")
         proxy = account.get("proxy")
         name = account.get("name")
@@ -155,6 +156,12 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                 self.filter_user_code()
             self.insert_data(data = self.list_account_filter)
             
+            self.list_statistics_state_child.clear()
+            self.list_statistics_state_child.addItem(f"Total: {len(self.list_account_filter)}")
+            for state in self.statictis_state:
+                self.list_statistics_state_child.addItem(f"{state}: {self.statictis_state[state]}")
+                
+    
     def filter_name(self):
         text = self.lineEdit_filter_name.text()
         if len(text) > 0:
@@ -179,7 +186,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         if len(text) > 0:
             list_temp = []
             for account in self.list_account_filter:
-                if str(account.get("state")).find(text) >= 0:
+                if str(account.get("state"))==text:
                     list_temp.append(account)
             self.list_account_filter = list_temp
             
@@ -200,11 +207,16 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
     def cleardata(self,clear_state = True):
         self.current_state = self.comboBox_filter_state.currentText()
         self.tableWidget_list_account.clear()
+        self.list_account_filter.clear()
+        self.statictis_state.clear()
+        #
         self.tableWidget_list_account.setRowCount(0)
         if clear_state:
             self.comboBox_filter_state.clear()
         
     def __get_data__(self):
+        self.list_account_from_server.clear()
+        self.statictis_state.clear()
         api = "get_facebook_account"
         last_time_update_ui = time.time()
         self.label_status.setText("Loading")
@@ -256,8 +268,12 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                     self.tableWidget_list_account.resizeColumnsToContents()
                     self.pushButton_Reload.setEnabled(True)
                     self.pushButton_reset.setEnabled(True)
-                    # self.pushButton_OpenBrower.setEnabled(True)
                     self.list_account_filter = self.list_account_from_server.copy()
+                    self.list_statistics_state_child.clear()
+                    self.list_statistics_state_child.addItem(f"Total: {len(self.list_account_filter)}")
+                    for state in self.statictis_state:
+                        self.list_statistics_state_child.addItem(f"{state}: {self.statictis_state[state]}")
+                        
                     return
                 if time.time()-last_time_update_ui>0.5:
                     last_time_update_ui = time.time()
@@ -296,6 +312,10 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         for row,account in enumerate(data):    
             has_proxy = account.get("proxy") is not None
             account_ok = account.get("state") =="OK"
+            if self.statictis_state.get(account.get("state")) is None:
+                self.statictis_state[account.get("state")] = 0
+            self.statictis_state[account.get("state")]+=1
+            
             for index,key in enumerate(list_header):
                 value = str(account.get(key))
                 if key == "proxy":

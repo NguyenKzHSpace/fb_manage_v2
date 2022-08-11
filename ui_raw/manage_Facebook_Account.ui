@@ -187,7 +187,11 @@
            <height>165</height>
           </rect>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_statistics"/>
+         <layout class="QVBoxLayout" name="verticalLayout_statistics">
+          <item>
+           <widget class="QListWidget" name="list_statistics_state_child"/>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>

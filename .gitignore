@@ -6,5 +6,9 @@
 
 gen_exe.bat
 build/*
-.gitignore
 fb_manage_v2.spec
+code_ui_over/manage_Facebook_Account.py
+dist/fb_manage_v2_debug.exe
+dist/fb_manage_v2.exe
+dist/fb_v2.zip
+dist/data/data

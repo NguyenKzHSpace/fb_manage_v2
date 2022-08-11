@@ -74,7 +74,13 @@ class Ui_LoginWindow_Over(Ui_LoginWindow):
             # Call API
             # 
             # #
-            res = requests.post(url=url, json=data,timeout=5)
+            try:
+                res = requests.post(url=url, json=data,timeout=20)
+            except:
+                dialog = QMessageBox(parent=self.widget, text=f"Login failed: server timeout.")
+                dialog.setWindowTitle("Login")
+                ret = dialog.exec()  
+                return False
             ##
             # Response error
             # #

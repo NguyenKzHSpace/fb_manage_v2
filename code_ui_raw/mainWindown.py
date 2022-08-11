@@ -57,6 +57,7 @@ class Ui_LoginWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.lineEdit_password.setFont(font)
+        self.lineEdit_password.setEchoMode(QtWidgets.QLineEdit.EchoMode.PasswordEchoOnEdit)
         self.lineEdit_password.setObjectName("lineEdit_password")
         self.horizontalLayout_2.addWidget(self.lineEdit_password)
         self.verticalLayout.addWidget(self.groupBox_2)

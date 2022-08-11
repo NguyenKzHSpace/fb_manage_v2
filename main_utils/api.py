@@ -36,7 +36,7 @@ def login(server:str = None, username:str = None,password:str = None):
         return False
     return False
     
-def call_api(method:str,api:str,data:dict = {},timeout:int = 5):
+def call_api(method:str,api:str,data:dict = {},timeout:int = 20):
     data_configs = read_data_configs()
     header = {
         "Authorization": data_configs.get('token'),
