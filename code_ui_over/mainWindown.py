@@ -31,9 +31,12 @@ class Ui_LoginWindow_Over(Ui_LoginWindow):
         email = self.lineEdit_email.text()
         password = self.lineEdit_password.text()
         server = self.lineEdit_server.text()
-        put_data_configs(key = "email",data = email)
-        put_data_configs(key = "password",data = password)
-        put_data_configs(key = "server",data = server)
+        try:
+            put_data_configs(key = "email",data = email)
+            put_data_configs(key = "password",data = password)
+            put_data_configs(key = "server",data = server)
+        except Exception as ex:
+            pass
             
     def login(self):
         ##

@@ -12,3 +12,5 @@ dist/fb_manage_v2_debug.exe
 dist/fb_manage_v2.exe
 dist/fb_v2.zip
 dist/data/data
+dist/*
+fb_manage_v2.build/*
