@@ -27,6 +27,7 @@ class Ui_OpenBrower(object):
         font = QtGui.QFont()
         font.setPointSize(14)
         self.lineEdit_input.setFont(font)
+        self.lineEdit_input.setInputMask("")
         self.lineEdit_input.setObjectName("lineEdit_input")
         self.verticalLayout_2.addWidget(self.lineEdit_input)
         self.checkBox_get_from_db = QtWidgets.QCheckBox(self.groupBox)
@@ -56,6 +57,7 @@ class Ui_OpenBrower(object):
         _translate = QtCore.QCoreApplication.translate
         OpenBrower.setWindowTitle(_translate("OpenBrower", "Open Brower"))
         self.groupBox.setTitle(_translate("OpenBrower", "Proxy"))
+        self.lineEdit_input.setPlaceholderText(_translate("OpenBrower", "IP:PORT:USER_NAME:PASSWORD"))
         self.checkBox_get_from_db.setText(_translate("OpenBrower", "Get proxy from DB"))
         self.pushButton_open.setText(_translate("OpenBrower", "Open"))
         self.pushButton_update.setText(_translate("OpenBrower", "Update"))

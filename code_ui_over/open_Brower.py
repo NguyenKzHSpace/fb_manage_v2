@@ -75,7 +75,20 @@ class Ui_OpenBrower_Over(Ui_OpenBrower):
                 ret = dialog.exec()  
                 return
         else:
-            pass
+            proxy_text = self.lineEdit_input.text().split(":")
+            if len(proxy_text)!=4:
+                dialog = QMessageBox(parent=self.widget, text=f"Proxy {self.lineEdit_input} has the wrong format.")
+                dialog.setWindowTitle("Proxy")
+                ret = dialog.exec()  
+                return
+            
+                
+            self.proxy = {
+                "ip":proxy_text[0],
+                "port":proxy_text[1],
+                "user_name":proxy_text[2],
+                "password":proxy_text[3]  
+            }
         
         if self.proxy is None:
             dialog = QMessageBox(parent=self.widget, text=f"Proxy in DB not found.")
