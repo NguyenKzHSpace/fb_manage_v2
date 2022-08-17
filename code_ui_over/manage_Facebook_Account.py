@@ -265,9 +265,10 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                         self.tableWidget_list_account.resizeColumnsToContents()
                         self.pushButton_Reload.setEnabled(True)
                         self.pushButton_reset.setEnabled(True)
-                        self.list_account_filter = self.list_account_from_server.copy()
+                        
                         self.list_statistics_state_child.clear()
-                        list_account = [account for account in self.list_account_filter if self.checkBox_ignore_trash.isChecked() and account.get('user_code')!='trash'  or self.checkBox_ignore_trash.isChecked()==False]
+                        list_account = [account for account in self.list_account_from_server if self.checkBox_ignore_trash.isChecked() and account.get('user_code')!='trash'  or self.checkBox_ignore_trash.isChecked()==False]
+                        self.list_account_filter = list_account
                         self.list_statistics_state_child.addItem(f"Tổng: {len(list_account)}")
                         for state in self.statictis_state:
                             self.list_statistics_state_child.addItem(f"{state}: {self.statictis_state[state]}")
@@ -298,9 +299,10 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                         self.tableWidget_list_account.resizeColumnsToContents()
                         self.pushButton_Reload.setEnabled(True)
                         self.pushButton_reset.setEnabled(True)
-                        self.list_account_filter = self.list_account_from_server.copy()
+                        
                         self.list_statistics_state_child.clear()
-                        list_account = [account for account in self.list_account_filter if self.checkBox_ignore_trash.isChecked() and account.get('user_code')!='trash'  or self.checkBox_ignore_trash.isChecked()==False]
+                        list_account = [account for account in self.list_account_from_server if self.checkBox_ignore_trash.isChecked() and account.get('user_code')!='trash'  or self.checkBox_ignore_trash.isChecked()==False]
+                        self.list_account_filter = list_account
                         self.list_statistics_state_child.addItem(f"Tổng: {len(list_account)}")
                         for state in self.statictis_state:
                             self.list_statistics_state_child.addItem(f"{state}: {self.statictis_state[state]}")
@@ -327,9 +329,10 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                     self.tableWidget_list_account.resizeColumnsToContents()
                     self.pushButton_Reload.setEnabled(True)
                     self.pushButton_reset.setEnabled(True)
-                    self.list_account_filter = self.list_account_from_server.copy()
+                
                     self.list_statistics_state_child.clear()
-                    list_account = [account for account in self.list_account_filter if self.checkBox_ignore_trash.isChecked() and account.get('user_code')!='trash'  or self.checkBox_ignore_trash.isChecked()==False]
+                    list_account = [account for account in self.list_account_from_server if self.checkBox_ignore_trash.isChecked() and account.get('user_code')!='trash'  or self.checkBox_ignore_trash.isChecked()==False]
+                    self.list_account_filter = list_account
                     self.list_statistics_state_child.addItem(f"Tổng: {len(list_account)}")
                     for state in self.statictis_state:
                         self.list_statistics_state_child.addItem(f"{state}: {self.statictis_state[state]}")
