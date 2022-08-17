@@ -43,6 +43,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         self.checkBox_filter_state.stateChanged.connect(self.filter_account)
         self.checkBox_filter_user_code.stateChanged.connect(self.filter_account)
         self.checkBox_filter_uid.stateChanged.connect(self.filter_account)
+        self.checkBox_ignore_trash.stateChanged.connect(self.filter_account)
         
         self.lineEdit_filter_name.textChanged.connect(lambda x: self.filter_account(type_ev="name"))
         self.lineEdit_filter_uid.textChanged.connect(lambda x: self.filter_account(type_ev="uid"))
@@ -121,6 +122,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         self.comboBox_filter_state.setCurrentText("")
         
     def filter_account(self,type_ev:str = None):
+        
         if type_ev =="name":
             if self.checkBox_filter_name.isChecked():
                 self.is_fillter = True
@@ -143,7 +145,15 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
     def filter_data(self):
         if self.is_fillter:
             self.cleardata(clear_state = False)
-            self.list_account_filter = self.list_account_from_server.copy()
+            if self.checkBox_ignore_trash.isChecked():
+                self.list_account_filter = []
+                for account in self.list_account_from_server:
+                    if account.get("user_code")=="trash":
+                        continue
+                    self.list_account_filter.append(account)
+            else:
+                self.list_account_filter = self.list_account_from_server.copy()
+            
             self.is_fillter = False
             self.list_state.clear()
             if self.checkBox_filter_name.isChecked():
@@ -157,7 +167,8 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
             self.insert_data(data = self.list_account_filter)
             
             self.list_statistics_state_child.clear()
-            self.list_statistics_state_child.addItem(f"Total: {len(self.list_account_filter)}")
+            list_account = [account for account in self.list_account_filter if self.checkBox_ignore_trash.isChecked() and account.get('user_code')!='trash'  or self.checkBox_ignore_trash.isChecked()==False]
+            self.list_statistics_state_child.addItem(f"Tổng: {len(list_account)}")
             for state in self.statictis_state:
                 self.list_statistics_state_child.addItem(f"{state}: {self.statictis_state[state]}")
                 
@@ -234,33 +245,81 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
             
                 data = {
                     "cursor": self.cursor,
-                    "limit":40,
+                    "limit":50,
                     "is_get_page_info":False
                 }
-                res = call_api(method="post",api=api,data=data)
-                       
-                if res.status_code != 200:
-                    print(res.status_code)
-                    print(res.text)
-                    return True, res.status_code
-                
-                res = res.json()
-                
-                data = res.get("data")
-                self.cursor = res.get("cursor")
-                have_next_page = res.get("have_next_page")
-                
-                for account in data:
-                    self.list_account_from_server.append(account)
+                try:
+                    res = call_api(method="post",api=api,data=data,timeout=10)
                     
-                self.insert_data(data=data)
-                
+                    if res.status_code != 200:
+                        print(res.status_code)
+                        print(res.text)
+                        self.comboBox_filter_state.clear()
+                        self.comboBox_filter_state.insertItems(1,self.list_state)    
+                        self.comboBox_filter_state.setCurrentText("")
+                        self.label_status.setText(f"Error.: {res.status_code} - {res.text}")
+                        self.checkBox_filter_name.setEnabled(True)
+                        self.checkBox_filter_uid.setEnabled(True)
+                        self.checkBox_filter_user_code.setEnabled(True)
+                        self.checkBox_filter_state.setEnabled(True)
+                        self.tableWidget_list_account.resizeColumnsToContents()
+                        self.pushButton_Reload.setEnabled(True)
+                        self.pushButton_reset.setEnabled(True)
+                        self.list_account_filter = self.list_account_from_server.copy()
+                        self.list_statistics_state_child.clear()
+                        list_account = [account for account in self.list_account_filter if self.checkBox_ignore_trash.isChecked() and account.get('user_code')!='trash'  or self.checkBox_ignore_trash.isChecked()==False]
+                        self.list_statistics_state_child.addItem(f"Tổng: {len(list_account)}")
+                        for state in self.statictis_state:
+                            self.list_statistics_state_child.addItem(f"{state}: {self.statictis_state[state]}")
+                            
+                        return True, res.status_code
                     
-                if have_next_page == False:
+                    res = res.json()
+                    
+                    data = res.get("data")
+                    self.cursor = res.get("cursor")
+                    have_next_page = res.get("have_next_page")
+                    
+                    for account in data:
+                        self.list_account_from_server.append(account)
+                        
+                    self.insert_data(data=data)
+                    
+                        
+                    if have_next_page == False:
+                        self.comboBox_filter_state.clear()
+                        self.comboBox_filter_state.insertItems(1,self.list_state)    
+                        self.comboBox_filter_state.setCurrentText("")
+                        self.label_status.setText("Complete.")
+                        self.checkBox_filter_name.setEnabled(True)
+                        self.checkBox_filter_uid.setEnabled(True)
+                        self.checkBox_filter_user_code.setEnabled(True)
+                        self.checkBox_filter_state.setEnabled(True)
+                        self.tableWidget_list_account.resizeColumnsToContents()
+                        self.pushButton_Reload.setEnabled(True)
+                        self.pushButton_reset.setEnabled(True)
+                        self.list_account_filter = self.list_account_from_server.copy()
+                        self.list_statistics_state_child.clear()
+                        list_account = [account for account in self.list_account_filter if self.checkBox_ignore_trash.isChecked() and account.get('user_code')!='trash'  or self.checkBox_ignore_trash.isChecked()==False]
+                        self.list_statistics_state_child.addItem(f"Tổng: {len(list_account)}")
+                        for state in self.statictis_state:
+                            self.list_statistics_state_child.addItem(f"{state}: {self.statictis_state[state]}")
+                            
+                        return
+             
+                    last_time_update_ui = time.time()
+                    text_loading = self.label_status.text()
+                    if len(text_loading)>len("Loading.")+4:
+                        text_loading= "Loading."
+                    text_loading+="."
+                    self.label_status.setText(text_loading)
+                    self.list_statistics_state_child.clear()
+                    self.list_statistics_state_child.addItem(f"Got: {len(self.list_account_from_server)} (account)")
+                except Exception as ex:
                     self.comboBox_filter_state.clear()
                     self.comboBox_filter_state.insertItems(1,self.list_state)    
                     self.comboBox_filter_state.setCurrentText("")
-                    self.label_status.setText("Complete.")
+                    self.label_status.setText(f"Error.: {ex}")
                     self.checkBox_filter_name.setEnabled(True)
                     self.checkBox_filter_uid.setEnabled(True)
                     self.checkBox_filter_user_code.setEnabled(True)
@@ -270,19 +329,11 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                     self.pushButton_reset.setEnabled(True)
                     self.list_account_filter = self.list_account_from_server.copy()
                     self.list_statistics_state_child.clear()
-                    self.list_statistics_state_child.addItem(f"Total: {len(self.list_account_filter)}")
+                    list_account = [account for account in self.list_account_filter if self.checkBox_ignore_trash.isChecked() and account.get('user_code')!='trash'  or self.checkBox_ignore_trash.isChecked()==False]
+                    self.list_statistics_state_child.addItem(f"Tổng: {len(list_account)}")
                     for state in self.statictis_state:
                         self.list_statistics_state_child.addItem(f"{state}: {self.statictis_state[state]}")
-                        
                     return
-                if time.time()-last_time_update_ui>0.5:
-                    last_time_update_ui = time.time()
-                    text_loading = self.label_status.text()
-                    if len(text_loading)>len("Loading.")+4:
-                        text_loading= "Loading."
-                    text_loading+="."
-                    self.label_status.setText(text_loading)
-                
             
         except Exception as ex:
             print(ex)
@@ -290,7 +341,13 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         
         
     def insert_data(self,data,list_header:List[str] = []):
-        
+        _data = []
+        for account in data:
+            if self.checkBox_ignore_trash.isChecked(): 
+                    if account.get("user_code") =="trash":
+                        continue
+            _data.append(account)
+        data = _data
         for account in data:
             count_column = 0
             for key in account:
@@ -298,6 +355,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                     if key in ["cookies","pages_info"]:
                         continue
                     list_header.append(key)
+                
                 count_column+=1
             if str(account.get("state")) not in self.list_state and len(str(account.get("state")))>0:
                 self.list_state.append(str(account.get("state")))
