@@ -197,7 +197,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         if len(text) > 0:
             list_temp = []
             for account in self.list_account_filter:
-                if str(account.get("state"))==text:
+                if str(account.get("state_vn"))==text:
                     list_temp.append(account)
             self.list_account_filter = list_temp
             
@@ -355,13 +355,13 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
             count_column = 0
             for key in account:
                 if key not in list_header:
-                    if key in ["cookies","pages_info"]:
+                    if key in ["cookies","pages_info","state"]:
                         continue
                     list_header.append(key)
                 
                 count_column+=1
-            if str(account.get("state")) not in self.list_state and len(str(account.get("state")))>0:
-                self.list_state.append(str(account.get("state")))
+            if str(account.get("state_vn")) not in self.list_state and len(str(account.get("state_vn")))>0:
+                self.list_state.append(str(account.get("state_vn")))
                 
             if self.tableWidget_list_account.columnCount()<count_column:
                 self.tableWidget_list_account.setColumnCount(count_column)
@@ -372,10 +372,10 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         
         for row,account in enumerate(data):    
             has_proxy = account.get("proxy") is not None
-            account_ok = account.get("state") =="OK"
-            if self.statictis_state.get(account.get("state")) is None:
-                self.statictis_state[account.get("state")] = 0
-            self.statictis_state[account.get("state")]+=1
+            account_ok = account.get("state_vn") =="OK"
+            if self.statictis_state.get(account.get("state_vn")) is None:
+                self.statictis_state[account.get("state_vn")] = 0
+            self.statictis_state[account.get("state_vn")]+=1
             
             for index,key in enumerate(list_header):
                 value = str(account.get(key))
