@@ -5,6 +5,8 @@ from main_utils.driver import init_Chrome_Driver
 from main_utils.file import pop_data_configs, put_data_configs, read_data_configs
 from PyQt6.QtWidgets import  QMessageBox,QWidget
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QAction, QIcon
+import pyperclip
 
 class Ui_Login_Facebook_Over(Ui_Login_Facebook):
     
@@ -23,9 +25,27 @@ class Ui_Login_Facebook_Over(Ui_Login_Facebook):
         self.label_ip.setText(self.ip)
         self.label_name.setText(self.name)
         self.label_uid.setText(self.uid)
-
+        
+        copy_ip_action = QAction(self.widget)
+        copy_ip_action.setStatusTip("This is your button")
+        copy_ip_action.triggered.connect(self.copy_ip)
+        
+        self.label_ip.mousePressEvent =self.copy_ip
+        self.label_uid.mousePressEvent =self.copy_uid
+        self.label_name.mousePressEvent =self.copy_name
+        
         self.pushButton_login.clicked.connect(lambda x: self.login())
         self.pushButton_update.clicked.connect(lambda x: self.update_cookie())
+    
+    def copy_ip(self,*arg, **kwargs):
+        pyperclip.copy(self.label_ip.text())
+    
+    def copy_uid(self,*arg, **kwargs):
+        pyperclip.copy(self.label_uid.text())
+    
+    def copy_name(self,*arg, **kwargs):
+        pyperclip.copy(self.label_name.text())
+        
         
     def update_cookie(self):
         if self.driver is None or len(self.driver.window_handles)<=0:

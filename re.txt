@@ -5,3 +5,4 @@ unidecode
 webdriver-manager
 selenium
 selenium-wire
+pyperclip
