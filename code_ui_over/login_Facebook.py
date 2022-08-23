@@ -5,7 +5,7 @@ from main_utils.driver import init_Chrome_Driver
 from main_utils.file import pop_data_configs, put_data_configs, read_data_configs
 from PyQt6.QtWidgets import  QMessageBox,QWidget
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtGui import QAction, QIcon,QFont
 import pyperclip
 
 class Ui_Login_Facebook_Over(Ui_Login_Facebook):
@@ -21,7 +21,7 @@ class Ui_Login_Facebook_Over(Ui_Login_Facebook):
         super().setupUi(widget)
         self.widget = widget
         
-        self.driver = None
+        self.driver = None    
         self.label_ip.setText(self.ip)
         self.label_name.setText(self.name)
         self.label_uid.setText(self.uid)
@@ -39,12 +39,52 @@ class Ui_Login_Facebook_Over(Ui_Login_Facebook):
     
     def copy_ip(self,*arg, **kwargs):
         pyperclip.copy(self.label_ip.text())
+        
+        font = self.label_uid.font()
+        font.setBold(False)
+        self.label_uid.setFont(font)
+        
+        font = self.label_ip.font()
+        font.setBold(True)
+        self.label_ip.setFont(font)
+        
+        
+        font = self.label_name.font()
+        font.setBold(False)
+        self.label_name.setFont(font)
+        
     
     def copy_uid(self,*arg, **kwargs):
         pyperclip.copy(self.label_uid.text())
-    
+        
+        font = self.label_uid.font()
+        font.setBold(True)
+        self.label_uid.setFont(font)
+        
+        font = self.label_ip.font()
+        font.setBold(False)
+        self.label_ip.setFont(font)
+        
+        
+        font = self.label_name.font()
+        font.setBold(False)
+        self.label_name.setFont(font)
+        
+        
     def copy_name(self,*arg, **kwargs):
         pyperclip.copy(self.label_name.text())
+        font = self.label_uid.font()
+        font.setBold(False)
+        self.label_uid.setFont(font)
+        
+        font = self.label_ip.font()
+        font.setBold(False)
+        self.label_ip.setFont(font)
+        
+        
+        font = self.label_name.font()
+        font.setBold(True)
+        self.label_name.setFont(font)
         
         
     def update_cookie(self):
