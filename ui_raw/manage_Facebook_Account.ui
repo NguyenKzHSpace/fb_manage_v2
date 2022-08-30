@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>889</width>
+    <width>1165</width>
     <height>806</height>
    </rect>
   </property>
@@ -100,6 +100,29 @@
        </widget>
       </item>
       <item>
+       <widget class="QGroupBox" name="groupBox_9">
+        <property name="title">
+         <string>Filter by proxy</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QCheckBox" name="checkBox_filter_proxy">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_filter_proxy">
+           <property name="placeholderText">
+            <string>Enter the Name</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <widget class="QGroupBox" name="groupBox_7">
         <property name="title">
          <string>Filter by State</string>
@@ -145,7 +168,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>869</width>
+        <width>1145</width>
         <height>420</height>
        </rect>
       </property>
@@ -193,7 +216,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>849</width>
+           <width>1125</width>
            <height>165</height>
           </rect>
          </property>

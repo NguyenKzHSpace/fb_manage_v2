@@ -1,17 +1,11 @@
 from typing import List
-import requests
 from code_ui_raw.manage_Facebook_Account import Ui_Manage_Facebook_Account
 from main_utils.api import call_api
-from main_utils.file import get_data_configs, pop_data_configs, put_data_configs, read_data_configs
-from PyQt6.QtWidgets import  QMessageBox,QWidget,QLabel
-from PyQt6.QtCore import Qt
-from threading import Thread
+from PyQt6.QtWidgets import  QWidget
 import threading
-import time
 import unidecode
-from main_utils.driver import init_Chrome_Driver
-from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem
+from PyQt6 import QtGui
+from PyQt6.QtWidgets import QTableWidgetItem
 from code_ui_over.open_Brower import Ui_OpenBrower_Over
 from code_ui_over.login_Facebook import Ui_Login_Facebook_Over
 class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
@@ -43,20 +37,43 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         self.checkBox_filter_state.stateChanged.connect(self.filter_account)
         self.checkBox_filter_user_code.stateChanged.connect(self.filter_account)
         self.checkBox_filter_uid.stateChanged.connect(self.filter_account)
+        self.checkBox_filter_proxy.stateChanged.connect(self.filter_account)
         self.checkBox_ignore_trash.stateChanged.connect(self.filter_account)
         
-        self.lineEdit_filter_name.textChanged.connect(lambda x: self.filter_account(type_ev="name"))
-        self.lineEdit_filter_uid.textChanged.connect(lambda x: self.filter_account(type_ev="uid"))
-        self.comboBox_filter_state.currentTextChanged.connect(lambda x: self.filter_account(type_ev="state"))
-        self.lineEdit_filter_user_code.textChanged.connect(lambda x: self.filter_account(type_ev="user_code"))
+        self.lineEdit_filter_name.textChanged.connect(lambda x: self.filter_account())
+        self.lineEdit_filter_uid.textChanged.connect(lambda x: self.filter_account())
+        self.comboBox_filter_state.currentTextChanged.connect(lambda x: self.filter_account())
+        self.lineEdit_filter_user_code.textChanged.connect(lambda x: self.filter_account())
+        self.lineEdit_filter_proxy.textChanged.connect(lambda x: self.filter_account())
 
         self.pushButton_reset.clicked.connect(self.reset_filter)
         self.pushButton_Reload.clicked.connect(self.get_data)
         
         self.tableWidget_list_account.currentItemChanged.connect(self.load_login_button)
-
+        self.tableWidget_list_account.doubleClicked.connect(self.dubleClicked)
         self.pushButton_login.clicked.connect(self.login_to_fb_account)
         self.pushButton_OpenBrower.clicked.connect(self.open_new_brower_with_proxy)
+    
+    def dubleClicked(self):
+        
+        row = self.tableWidget_list_account.currentRow()    
+        if len(self.list_account_filter)<=row:
+            self.pushButton_login.setEnabled(False)
+            return
+        
+        account = self.list_account_filter[row]
+        proxy = account.get("proxy")
+        
+        if self.checkBox_filter_proxy.isChecked()==False:
+            proxy_value = "None"
+            if account.get("proxy"):
+                proxy = account.get("proxy")
+                proxy_value = f"{proxy.get('ip')}:{proxy.get('port')}"
+            self.lineEdit_filter_proxy.setText(proxy_value)
+        
+        if self.checkBox_filter_user_code.isChecked()==False:
+            self.lineEdit_filter_user_code.setText(account.get("user_code"))
+           
         
     def load_login_button(self):
         
@@ -66,10 +83,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
             return
         
         account = self.list_account_filter[row]
-        
-        cookies = account.get("cookies")
         proxy = account.get("proxy")
-        
         if proxy is None:
             self.pushButton_login.setEnabled(False)
             return
@@ -121,24 +135,9 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         self.lineEdit_filter_user_code.setText("")
         self.comboBox_filter_state.setCurrentText("")
         
-    def filter_account(self,type_ev:str = None):
-        
-        if type_ev =="name":
-            if self.checkBox_filter_name.isChecked():
-                self.is_fillter = True
-        elif type_ev =="uid":
-            if self.checkBox_filter_uid.isChecked():
-                self.is_fillter = True
-        elif type_ev =="state":
-            if self.checkBox_filter_state.isChecked():
-                self.is_fillter = True
-        elif type_ev =="user_code":
-            if self.checkBox_filter_user_code.isChecked():
-                self.is_fillter = True
-        else:     
-            self.is_fillter = True
-        
-        if self.is_fillter ==True  is not None and self.thread_update_gui is not None and self.thread_update_gui.is_alive()==False or self.thread_update_gui is None:
+    def filter_account(self,**kwargs):
+        self.is_fillter = True
+        if self.thread_update_gui is not None and self.thread_update_gui.is_alive()==False or self.thread_update_gui is None:
             self.thread_update_gui = threading.Thread(target=self.filter_data)
             self.thread_update_gui.start()
   
@@ -164,6 +163,9 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                 self.filter_uid()
             if self.checkBox_filter_user_code.isChecked():
                 self.filter_user_code()
+            if self.checkBox_filter_proxy.isChecked():
+                self.filter_proxy()
+                
             self.insert_data(data = self.list_account_filter)
             
             self.list_statistics_state_child.clear()
@@ -183,6 +185,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                     list_temp.append(account)
             self.list_account_filter = list_temp
     
+    
     def filter_uid(self):
         text = self.lineEdit_filter_uid.text()
         if len(text) > 0:
@@ -190,6 +193,21 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
             for account in self.list_account_filter:
                 if str(account.get("uid")).find(text) >= 0:
                     list_temp.append(account)
+            self.list_account_filter = list_temp
+    
+    def filter_proxy(self):
+        text = self.lineEdit_filter_proxy.text()
+        if len(text) > 0:
+            list_temp = []
+            for account in self.list_account_filter:
+                proxy_value = "None"
+                if account.get("proxy"):
+                    proxy = account.get("proxy")
+                    proxy_value = f"{proxy.get('ip')}:{proxy.get('port')}:{proxy.get('user_name')}:{proxy.get('password')}"
+                if proxy_value.find(text) >= 0:
+                    list_temp.append(account)
+                    
+                        
             self.list_account_filter = list_temp
             
     def filter_state(self):
@@ -229,12 +247,12 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         self.list_account_from_server.clear()
         self.statictis_state.clear()
         api = "get_facebook_account"
-        last_time_update_ui = time.time()
         self.label_status.setText("Loading")
-        current_row = 0
         self.checkBox_filter_name.setEnabled(False)
         self.checkBox_filter_uid.setEnabled(False)
         self.checkBox_filter_user_code.setEnabled(False)
+        self.checkBox_filter_proxy.setEnabled(False)
+        self.tableWidget_list_account.clear()
         self.checkBox_filter_state.setEnabled(False)
         self.pushButton_login.setEnabled(False)
         self.pushButton_Reload.setEnabled(False)
@@ -261,6 +279,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                         self.checkBox_filter_name.setEnabled(True)
                         self.checkBox_filter_uid.setEnabled(True)
                         self.checkBox_filter_user_code.setEnabled(True)
+                        self.checkBox_filter_proxy.setEnabled(True)
                         self.checkBox_filter_state.setEnabled(True)
                         self.tableWidget_list_account.resizeColumnsToContents()
                         self.pushButton_Reload.setEnabled(True)
@@ -295,6 +314,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                         self.checkBox_filter_name.setEnabled(True)
                         self.checkBox_filter_uid.setEnabled(True)
                         self.checkBox_filter_user_code.setEnabled(True)
+                        self.checkBox_filter_proxy.setEnabled(True)
                         self.checkBox_filter_state.setEnabled(True)
                         self.tableWidget_list_account.resizeColumnsToContents()
                         self.pushButton_Reload.setEnabled(True)
@@ -309,7 +329,6 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                             
                         return
              
-                    last_time_update_ui = time.time()
                     text_loading = self.label_status.text()
                     if len(text_loading)>len("Loading.")+4:
                         text_loading= "Loading."
@@ -325,6 +344,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                     self.checkBox_filter_name.setEnabled(True)
                     self.checkBox_filter_uid.setEnabled(True)
                     self.checkBox_filter_user_code.setEnabled(True)
+                    self.checkBox_filter_proxy.setEnabled(True)
                     self.checkBox_filter_state.setEnabled(True)
                     self.tableWidget_list_account.resizeColumnsToContents()
                     self.pushButton_Reload.setEnabled(True)
@@ -372,29 +392,30 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         
         for row,account in enumerate(data):    
             has_proxy = account.get("proxy") is not None
-            account_ok = account.get("state_vn") =="OK"
             if self.statictis_state.get(account.get("state_vn")) is None:
                 self.statictis_state[account.get("state_vn")] = 0
             self.statictis_state[account.get("state_vn")]+=1
             
             for index,key in enumerate(list_header):
-                value = str(account.get(key))
-                if key == "proxy":
-                    if has_proxy:
-                        value = "Yes"
-                    else:
-                        value = "No"
                 
-                newitem = QTableWidgetItem(value)
-                if has_proxy == False:
+                newitem = None
+                if key == "proxy":
+                    value = str(account.get(key))
+                    if account.get(key) is not None:
+                        value = f"{account.get(key).get('ip')}:{account.get(key).get('port')}:{account.get(key).get('user_name')}:{account.get(key).get('password')}"
+                    newitem = QTableWidgetItem(value)
+              
+                    self.tableWidget_list_account.setItem(row+current_row_count, index, newitem)
+                  
+                else:
+                    value = str(account.get(key))
+                    newitem = QTableWidgetItem(value)
+                    self.tableWidget_list_account.setItem(row+current_row_count, index, newitem)
+            
+                if has_proxy == False and newitem:
                     font = QtGui.QFont()
                     font.setBold(True)
                     newitem.setFont(font)
-                # if account_ok:
-                #     newitem.setForeground(QBrush(QColor(0, 255, 0)))
-                self.tableWidget_list_account.setItem(row+current_row_count, index, newitem)
-        
-        
 
         
         

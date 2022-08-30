@@ -1,10 +1,8 @@
-import requests
+
 from code_ui_raw.open_Brower import Ui_OpenBrower
 from main_utils.api import call_api
 from main_utils.driver import init_Chrome_Driver
-from main_utils.file import pop_data_configs, put_data_configs, read_data_configs
-from PyQt6.QtWidgets import  QMessageBox,QWidget
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import  QMessageBox
 
 class Ui_OpenBrower_Over(Ui_OpenBrower):
     def setupUi(self, widget):

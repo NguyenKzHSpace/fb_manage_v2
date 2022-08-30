@@ -1,11 +1,8 @@
-import requests
 from code_ui_raw.login_Facebook import Ui_Login_Facebook
 from main_utils.api import call_api
 from main_utils.driver import init_Chrome_Driver
-from main_utils.file import pop_data_configs, put_data_configs, read_data_configs
-from PyQt6.QtWidgets import  QMessageBox,QWidget
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction, QIcon,QFont
+from PyQt6.QtWidgets import  QMessageBox
+from PyQt6.QtGui import QAction
 import pyperclip
 
 class Ui_Login_Facebook_Over(Ui_Login_Facebook):

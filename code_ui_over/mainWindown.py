@@ -1,11 +1,8 @@
 import requests
 from code_ui_over.manage_Facebook_Account import Ui_Manage_Facebook_Account_Over
 from code_ui_raw.mainWindown import Ui_LoginWindow
-from code_ui_raw.manage_Facebook_Account import Ui_Manage_Facebook_Account
 from main_utils.file import pop_data_configs, put_data_configs, read_data_configs
-import threading
 from PyQt6.QtWidgets import  QMessageBox,QWidget
-from PyQt6.QtCore import Qt
 class Ui_LoginWindow_Over(Ui_LoginWindow):
     
     
