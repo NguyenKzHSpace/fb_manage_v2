@@ -2,7 +2,7 @@ from selenium.webdriver.chrome.options import Options
 from seleniumwire import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-def init_Chrome_Driver(proxy_user_name:str,proxy_password:str,proxy_ip:str,proxy_port:str) -> (webdriver.Chrome):
+def init_Chrome_Driver(proxy_user_name:str,proxy_password:str,proxy_ip:str,proxy_port:str) -> (tuple[webdriver.Chrome,str]):
     chrome_options = Options()
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')

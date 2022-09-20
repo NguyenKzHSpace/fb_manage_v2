@@ -117,9 +117,32 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
         
         
     def open_new_brower_with_proxy(self):
+        row = self.tableWidget_list_account.currentRow()    
+        uid = None
+        proxy_value = None
+        password = None
+        if len(self.list_account_filter)>=row and row>=0:
+            account = self.list_account_filter[row]
+            uid = account.get("uid")
+            proxy = account.get("proxy")
+            if proxy is not None:
+                proxy_value = f"{proxy.get('ip')}:{proxy.get('port')}:{proxy.get('user_name')}:{proxy.get('password')}"
+                password = account.get("password")
+                
+        
         self.manage_window_QWidget = QWidget()
         open_brower_fr = Ui_OpenBrower_Over()
         open_brower_fr.setupUi(self.manage_window_QWidget)
+        
+        if uid is not None:
+            open_brower_fr.lineEdit_input_uid.setText(str(uid))
+            
+        if proxy_value is not None:
+            open_brower_fr.lineEdit_input.setText(proxy_value)
+        
+        if password is not None:
+            open_brower_fr.lineEdit_input_password.setText(password) 
+            
         self.manage_window_QWidget.show()
         
         
@@ -375,8 +398,9 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
             count_column = 0
             for key in account:
                 if key not in list_header:
-                    if key in ["cookies","pages_info","state"]:
+                    if key in ["pages_info","state"]:
                         continue
+                    
                     list_header.append(key)
                 
                 count_column+=1
