@@ -430,7 +430,15 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                     newitem = QTableWidgetItem(value)
               
                     self.tableWidget_list_account.setItem(row+current_row_count, index, newitem)
-                  
+                if key == "cookies":
+                    value = str(account.get(key))
+                    if  account.get(key) is not None:
+                        for cookie in account.get(key):
+                            value += f"{cookie['name']}={cookie['value']}; "
+                    value = value[:-2]
+                    newitem = QTableWidgetItem(value)
+              
+                    self.tableWidget_list_account.setItem(row+current_row_count, index, newitem)
                 else:
                     value = str(account.get(key))
                     newitem = QTableWidgetItem(value)
