@@ -433,6 +433,7 @@ class Ui_Manage_Facebook_Account_Over(Ui_Manage_Facebook_Account):
                 if key == "cookies":
                     value = str(account.get(key))
                     if  account.get(key) is not None:
+                        value = ""
                         for cookie in account.get(key):
                             value += f"{cookie['name']}={cookie['value']}; "
                     value = value[:-2]
