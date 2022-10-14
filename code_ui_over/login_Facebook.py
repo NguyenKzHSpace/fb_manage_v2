@@ -4,7 +4,15 @@ from main_utils.driver import init_Chrome_Driver
 from PyQt6.QtWidgets import  QMessageBox
 from PyQt6.QtGui import QAction
 import pyperclip
+from PyQt6.QtCore import QThread
 
+class Thr(QThread):
+    def __init__(self, fun):
+        super().__init__()
+        self.fun = fun
+    def run(self):
+        self.fun()
+        
 class Ui_Login_Facebook_Over(Ui_Login_Facebook):
     
     def set_info_login(self,proxy,cookies,name,uid,ip):
@@ -137,6 +145,9 @@ class Ui_Login_Facebook_Over(Ui_Login_Facebook):
         
     
     def login(self):
+        self.thr_login = Thr(self._login)
+        self.thr_login.start()
+    def _login(self):
         self.driver,msg = init_Chrome_Driver(proxy_user_name=self.proxy["user_name"],proxy_password=self.proxy["password"],proxy_ip=self.proxy["ip"],proxy_port=self.proxy["port"])
         if self.driver is None:
             dialog = QMessageBox(parent=self.widget, text=msg)

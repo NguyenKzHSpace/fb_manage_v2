@@ -69,6 +69,15 @@ class Ui_OpenBrower(object):
 
         self.verticalLayout.addWidget(self.groupBox_3)
 
+        self.lineEdit_text_input = QLineEdit(OpenBrower)
+        self.lineEdit_text_input.setObjectName(u"lineEdit_text_input")
+        font2 = QFont()
+        font2.setPointSize(14)
+        font2.setBold(True)
+        self.lineEdit_text_input.setFont(font2)
+
+        self.verticalLayout.addWidget(self.lineEdit_text_input)
+
         self.groupBox_2 = QGroupBox(OpenBrower)
         self.groupBox_2.setObjectName(u"groupBox_2")
         self.groupBox_2.setMaximumSize(QSize(16777215, 50))
@@ -113,6 +122,8 @@ class Ui_OpenBrower(object):
         self.lineEdit_input_password.setInputMask("")
         self.lineEdit_input_password.setText("")
         self.lineEdit_input_password.setPlaceholderText(QCoreApplication.translate("OpenBrower", u"PASSWORD", None))
+        self.lineEdit_text_input.setText("")
+        self.lineEdit_text_input.setPlaceholderText(QCoreApplication.translate("OpenBrower", u"USERNAME PASSWORD PROXY", None))
         self.groupBox_2.setTitle("")
         self.pushButton_open.setText(QCoreApplication.translate("OpenBrower", u"Open", None))
         self.pushButton_update.setText(QCoreApplication.translate("OpenBrower", u"Update", None))

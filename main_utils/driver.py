@@ -9,6 +9,7 @@ def init_Chrome_Driver(proxy_user_name:str,proxy_password:str,proxy_ip:str,proxy
     chrome_options.add_argument("--disable-notifications")
     chrome_options.add_argument("--incognito")
     chrome_options.add_argument('--disable-logging')  
+ 
     wire_options = {}
     wire_options['proxy'] = {
         'https': f'https://{proxy_user_name}:{proxy_password}@{proxy_ip}:{proxy_port}',
@@ -25,14 +26,6 @@ def init_Chrome_Driver(proxy_user_name:str,proxy_password:str,proxy_ip:str,proxy
         if driver.find_elements(By.ID,"ip_address")[0].text != proxy_ip:
             return None,"Proxy connection lost."
     except Exception as ex:
-        try:
-            driver.close()
-        except:
-            pass
-        try:
-            driver.quit()
-        except:
-            pass
         return None,"Proxy connection lost."
 
     return driver, "Ok"

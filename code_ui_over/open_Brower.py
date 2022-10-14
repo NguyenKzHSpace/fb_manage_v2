@@ -1,4 +1,5 @@
 
+import re
 import time
 from code_ui_raw.open_Brower import Ui_OpenBrower
 from main_utils.api import call_api
@@ -6,7 +7,16 @@ from main_utils.driver import init_Chrome_Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from PyQt6.QtWidgets import  QMessageBox
+from PyQt6.QtCore import QThread
 
+class Thr(QThread):
+    def __init__(self, fun):
+        super().__init__()
+        self.fun = fun
+    def run(self):
+        self.fun()
+                
+                
 class Ui_OpenBrower_Over(Ui_OpenBrower):
     def setupUi(self, widget):
         super().setupUi(widget)
@@ -16,7 +26,26 @@ class Ui_OpenBrower_Over(Ui_OpenBrower):
         self.checkBox_get_from_db.setChecked(True)
         self.pushButton_open.clicked.connect(self.open_brower)
         self.pushButton_update.clicked.connect(self.update_cookie)
-        self.lineEdit_input_uid.setText("afsdfasdf")
+        self.lineEdit_text_input.textChanged.connect(self.read_text)
+        self.thr = None
+        
+    def read_text(self):
+        text = self.lineEdit_text_input.text()
+        result = re.search(r"([\d]+.[\d]+.[\d]+.[\d]+:[\d]+:.+)",text)
+        if result:
+            proxy = result.group(1)
+            text = text[:-len(proxy)-1]
+            result = re.search(r"([\w.@_]+) ",text)
+            if result:
+                username = result.group(1)
+                passwrod = text[len(username)+1:]
+                self.lineEdit_input_password.setText(passwrod)
+                self.lineEdit_input_uid.setText(username)
+                self.lineEdit_input.setText(proxy)
+                self.checkBox_get_from_db.setChecked(False)
+                
+
+
         
     def update_cookie(self):
         if self.driver is None or len(self.driver.window_handles)<=0:
@@ -109,15 +138,17 @@ class Ui_OpenBrower_Over(Ui_OpenBrower):
             dialog.setWindowTitle("Proxy")
             ret = dialog.exec()  
             return
-        
+    
+        self.thr = Thr(self.open_sele)
+        self.thr.start()
+    
+    def open_sele(self):    
         self.driver,msg = init_Chrome_Driver(proxy_user_name=self.proxy["user_name"],proxy_password=self.proxy["password"],proxy_ip=self.proxy["ip"],proxy_port=self.proxy["port"])
         if self.driver is None:
             dialog = QMessageBox(parent=self.widget, text=msg)
             dialog.setWindowTitle("Error")
             ret = dialog.exec() 
             return
-        
-        
         self.driver.get("https://www.facebook.com")
         
         if self.checkBox_auto_login.isChecked():
@@ -131,8 +162,12 @@ class Ui_OpenBrower_Over(Ui_OpenBrower):
             time.sleep(5)
             element_login = self.driver.find_element(by=By.NAME,value="login")
             element_login.click()
-            
-            
+        
+        while True:
+            try:
+                self.driver.title()
+            except:
+                break
         
     def send_keys(self, action: ActionChains, keys_to_send:str):
         """
